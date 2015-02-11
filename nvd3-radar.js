@@ -287,7 +287,7 @@ nv.models.radarChart = function() {
           }
         , dispatch = d3.dispatch('tooltipShow', 'tooltipHide','prevClick','stateChange')
     ;
-    
+
     var line = d3.svg.line()
         .x(function(d) { return d.x})
         .y(function(d) { return d.y});
@@ -326,7 +326,7 @@ nv.models.radarChart = function() {
 
     function chart(selection) {
         selection.each(function(data) {
-            
+            legs=data[0].values;//TODO: Think in a better way to put only the legs of the radar
             var container = d3.select(this),
                 that = this,
                 size = legs.length,
@@ -402,7 +402,7 @@ nv.models.radarChart = function() {
                 startAngle = 135
                 //Focus
                 var currentLeg = legs[current];
-                var rgbLeg = hexToRgb(currentLeg.color);
+                var rgbLeg = hexToRgb("#000000");
                 var controlWrap = wrap.select('g.nv-controlWrap');
                 
                 wrap.select('g.control').remove();
@@ -411,7 +411,7 @@ nv.models.radarChart = function() {
                 
                 var controlLine = controlEnter.append("svg:line")
                     .attr('class', 'indicator')
-                    .style("stroke", currentLeg.color)
+                    .style("stroke", "#000000")
                     .style("fill", "none")
                     .style("opacity", 1)
                     .style("stroke-width", 1.5)
@@ -429,7 +429,7 @@ nv.models.radarChart = function() {
                 controlDescription.append("xhtml:div")
                         .attr('class', 'radar-description')
                         .style("background-color", 'rgba('+rgbLeg.r+','+rgbLeg.g+','+rgbLeg.b+',0.1)')
-                        .style('border-bottom', '1px solid '+currentLeg.color)
+                        .style('border-bottom', '1px solid '+"#000000")
                         .style("padding", "10px")
                         .style("text-align", "justify")
                         .text( currentLeg.description );
