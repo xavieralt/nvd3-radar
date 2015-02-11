@@ -1,8 +1,6 @@
-radar-nvd3
+Nvd3-radar
 ==========
 
-Radar Plot using nvd3.js librairie
+Radar Plot using nvd3.js library
 
-Exemple: [http://www.marc-dugas.fr/projets/radar-nvd3/](http://www.marc-dugas.fr/projets/radar-nvd3/)
 
-![](http://www.marc-dugas.fr/projets/radar-nvd3/radar-nvd3.png)
