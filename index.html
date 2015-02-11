@@ -8,7 +8,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link href="bower_components/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
-        <link href="css/nv.radar.css" rel="stylesheet" type="text/css">
         <style>
             html,body {margin:0;padding:0;width:100%;height:100%}
 
@@ -33,12 +32,10 @@
             <svg></svg>
         </div>
 
-        <!--<script src="js/d3.v2.min.js"></script>-->
-        <script src="bower_components/d3/d3.js"></script>
-        <script src="js/nvd3/nv.d3.min.js"></script>
-          <!-- <script src="bower_components/nvd3/nv.d3.js"></script>-->
-         <script src="js/nvd3/src/models/radar.js"></script>
-         <script src="js/nvd3/src/models/radarChart.js"></script>
+         <script src="bower_components/d3/d3.js"></script>
+         <script src="bower_components/nvd3/nv.d3.js"></script>
+         <script src="radar.js"></script>
+         <script src="nvd3-radar.js"></script>
          <script>
 
              nv.addGraph(function() {
@@ -59,13 +56,13 @@
              function legsVal() {
                  var legs = [];
 
-                 for (var i = 0; i < 35; i++) {
+                 for (var i = 0; i < 15; i++) {
                      if(i == 5)
                      legs.push({active:true,label:"Leg "+i,color:'#000000'});
                      else
                      legs.push({label:"Leg "+i,color:'#000000'});
                  }
-
+                console.log(JSON.stringify(legs))
                  return legs;
              }
 
@@ -75,11 +72,11 @@
                    d3 = [],
                    d4 = [];
 
-                 for (var i = 0; i < 35; i++) {
-                 d1.push({value:Math.floor((Math.random()*5)+1)});
-                 d2.push({value:Math.floor((Math.random()*5)+1)});
-                 d3.push({value:Math.floor((Math.random()*5)+1)});
-                 d4.push({value:Math.floor((Math.random()*5)+1)});
+                 for (var i = 0; i < 15; i++) {
+                 d1.push({axis:"Leg "+i,value:Math.floor((Math.random()*5)+1)});
+                 d2.push({axis:"Leg "+i,value:Math.floor((Math.random()*5)+1)});
+                 d3.push({axis:"Leg "+i,value:Math.floor((Math.random()*5)+1)});
+                 d4.push({axis:"Leg "+i,value:Math.floor((Math.random()*5)+1)});
                  }
 
                  var ret = [
@@ -100,6 +97,7 @@
                    key: "Groupe de données n°4"
                  }
                  ];
+                 console.log(JSON.stringify(ret))
                  return ret;
              }
 
