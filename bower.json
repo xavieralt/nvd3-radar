@@ -1,0 +1,29 @@
+{
+  "name": "nvd3-radar",
+  "version": "0.0.1",
+  "homepage": "https://github.com/analyticboard/nvd3-radar",
+  "authors": [
+    "Marc Dugas",
+    "Jaime Garcia"
+  ],
+  "description": "radar chart plugin for nvd3",
+  "main": "index.html",
+  "keywords": [
+    "d3",
+    "visualization",
+    "nvd3",
+    "radar"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.4.1",
+    "nvd3": "~v1.1.15-beta"
+   }
+}
