@@ -281,6 +281,7 @@ nv.models.radarChart = function() {
         , startAngle = 180
         , cursor = 0
         , tooltips = true
+        , transitionDuration = 250
         , tooltip = function(key, leg, value, e, graph) {
             return '<h3>' + key + '</h3>' +
                    '<p>' + leg + ': ' +  value + '</p>'
@@ -298,9 +299,9 @@ nv.models.radarChart = function() {
     //============================================================
     // Private Variables
     //------------------------------------------------------------
-    
+
     var showTooltip = function(e, offsetElement) {
-    
+
         // New addition to calculate position if SVG is scaled with viewBox, may move TODO: consider implementing everywhere else
         if (offsetElement) {
             var svg = d3.select(offsetElement).select('svg');
@@ -312,7 +313,7 @@ nv.models.radarChart = function() {
                 e.pos[1] = e.pos[1] * ratio;
             }
         }
-        
+
         var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
             top = e.pos[1] + ( offsetElement.offsetTop || 0),
             val = e.series.values[e.pointIndex].value,
@@ -320,7 +321,7 @@ nv.models.radarChart = function() {
             content = tooltip(e.series.key, leg, val, e, chart);
             nv.tooltip.show([left, top], content, null, null, offsetElement);
     };
-    
+
     //============================================================
 
 
@@ -333,12 +334,12 @@ nv.models.radarChart = function() {
                 availableWidth = (width  || parseInt(container.style('width')) || 500) - margin.left - margin.right,
                 availableHeight = (height || parseInt(container.style('height')) || 500) - margin.top - margin.bottom;
 
-            chart.update = function() { chart(selection) };
+            chart.update = function() { container.transition().duration(transitionDuration).call(chart) };
             chart.container = this;
 
             var current = 0;
             if (cursor < 0) {
-                current = Math.abs(cursor);  
+                current = Math.abs(cursor);
             }
             else if (cursor > 0) {
                  current = legs.length - cursor;
@@ -346,7 +347,7 @@ nv.models.radarChart = function() {
 
             //------------------------------------------------------------
             // Setup Scales
-            
+
             // scales = radars.scales();
             radius = (availableWidth-300 >= availableHeight) ? (availableHeight)/2 : (availableWidth-300)/2;
             scales.domain([0, ticks]).range([0,radius]);
@@ -365,26 +366,26 @@ nv.models.radarChart = function() {
             gEnter.append('g').attr('class', 'nv-gridWrap');
             gEnter.append('g').attr('class', 'nv-radarsWrap');
             gEnter.append('g').attr('class', 'nv-legendWrap');
-            
+
             var gridWrap = wrap.select('g.nv-gridWrap');
             gridWrap.append("g").attr("class", "grid");
             gridWrap.append("g").attr("class", "axes");
-            
+
             wrap.attr('transform', 'translate(' + parseFloat(radius + margin.left) + ',' + parseFloat(radius + margin.top) + ')');
-             
+
             //------------------------------------------------------------
-            
-            
+
+
             //------------------------------------------------------------
             // Legend
-        
+
             if (showLegend) {
                 legend.width(30);
 
                 g.select('.nv-legendWrap')
                     .datum(data)
                     .call(legend);
-        
+
                 /*
                 if ( margin.top != legend.height()) {
                   margin.top = legend.height();
@@ -395,20 +396,20 @@ nv.models.radarChart = function() {
                 g.select('.nv-legendWrap')
                     .attr('transform', 'translate(' + (radius + margin.left + margin.right) + ',' + (-radius) +')');
             }
-                        
+
             //------------------------------------------------------------
-            
+
             if (edit) {
                 startAngle = 135
                 //Focus
                 var currentLeg = legs[current];
                 var rgbLeg = hexToRgb("#000000");
                 var controlWrap = wrap.select('g.nv-controlWrap');
-                
+
                 wrap.select('g.control').remove();
                 var controlEnter = controlWrap.append("g")
                     .attr("class", "control");
-                
+
                 var controlLine = controlEnter.append("svg:line")
                     .attr('class', 'indicator')
                     .style("stroke", "#000000")
@@ -419,13 +420,13 @@ nv.models.radarChart = function() {
                     .attr("y1", Math.cos(angle(current, size)) * scales(scales.domain()[1]))
                     .attr("x2", Math.sin(angle(current, size)) * scales(scales.domain()[1]))
                     .attr("y2", Math.cos(angle(current, size)) * scales(scales.domain()[1]));
-    
+
                 var controlDescription = controlEnter.append("svg:foreignObject")
                     .attr('width',200)
                     .attr('height',0)
             		.attr("x", Math.sin(angle(current, size)) * scales(scales.domain()[1]) * 2)
     				.attr("y", Math.cos(angle(current, size)) * scales(scales.domain()[1]));
-                    
+
                 controlDescription.append("xhtml:div")
                         .attr('class', 'radar-description')
                         .style("background-color", 'rgba('+rgbLeg.r+','+rgbLeg.g+','+rgbLeg.b+',0.1)')
@@ -433,23 +434,23 @@ nv.models.radarChart = function() {
                         .style("padding", "10px")
                         .style("text-align", "justify")
                         .text( currentLeg.description );
-                        
-     
+
+
                 var controlActionContent = controlEnter.append("svg:foreignObject")
                     .attr('width',200)
                     .attr('height',50)
                     .attr("x", Math.sin(angle(current, size)) * scales(scales.domain()[1]) * 2)
         			.attr("y", Math.cos(angle(current, size)) * scales(scales.domain()[1]) - 25);
-                    
+
                 controlActionContent.append("xhtml:button")
                         .attr('type','button')
                         .attr('class','radar-prev btn btn-mini icon-arrow-left')
                         .text('prev');
-                
-                
+
+
                 var controlSelect = controlActionContent.append("xhtml:select")
                     .attr('class','radar-select-note');
-    
+
                 controlSelect.append('xhtml:option')
                             .attr('value',0)
                            // .attr('selected', function(d,i){ return (d[0].values[current].value == 0) ? true : false;})
@@ -474,21 +475,21 @@ nv.models.radarChart = function() {
                             .attr('value',5)
                          //   .attr('selected', function(d,i){ return (d[0].values[current].value == 4) ? true : false;})
                             .text('Très bien')
-                
+
                 controlActionContent.append("xhtml:button")
                         .attr('type','button')
                         .attr('class','radar-next btn btn-mini icon-arrow-right')
                         .text('next');
-                        
-                        
+
+
                 var checkOption = function (d) {
                     if(d[0].values[current].value == this.value){
                         return d3.select(this).attr("selected", "selected");
                     }
                 };
-                
+
                 controlSelect.selectAll("option").each(checkOption);
-                 
+
                 // Animation
                 controlLine.transition().duration(500)
                     .attr("x1", Math.sin(angle(current, size)) * scales(scales.domain()[1]))
@@ -496,7 +497,7 @@ nv.models.radarChart = function() {
                     .attr("x2", Math.sin(angle(current, size)) * scales(scales.domain()[1]) * 2 + 200)
                     .attr("y2", Math.cos(angle(current, size)) * scales(scales.domain()[1]))
                     .each('end',  function(d){ controlDescription.transition().duration(300).attr('height','100%') });
-                 
+
                 // Controls
                 controlWrap.select('.radar-prev')
                     .on('click', function(d) {
@@ -508,24 +509,24 @@ nv.models.radarChart = function() {
                         chart.next();
                         selection.transition().call(chart);
                     });
-                    
+
                 controlWrap.select('.radar-select-note')
                     .on('change', function(d) {
                         d[0].values[current].value = this.value;
                         chart.next();
                         selection.transition().call(chart);
                     });
-                
+
                 //change
             } else {
                 cursor = 0;
                 startAngle = 180;
                 wrap.select('g.control').remove();
             }
-            
+
             //------------------------------------------------------------
             // Main Chart Component(s)
-            
+
             radars
                 .width(availableWidth)
                 .height(availableHeight)
@@ -539,44 +540,44 @@ nv.models.radarChart = function() {
                     return d.color || color(d, i);
                 }).filter(function(d,i) { return !data[i].disabled }))
                 ;
-            
-            
+
+
             var radarWrap = g.select('.nv-radarsWrap')
                 .datum(data.filter(function(d) { return !d.disabled }));
-            
+
             d3.transition(radarWrap).call(radars);
-            
+
             //------------------------------------------------------------
-            
+
             //------------------------------------------------------------
             // Setup Axes
-            
+
             // the grid data, number of ticks
             var gridData = buildAxisGrid(size, ticks);
-            
+
             // Grid
             var grid = wrap.select('.grid').selectAll('.gridlevel').data(gridData);
             grid.exit().remove();
-            
+
             grid.enter().append("path")
                 .attr("class", "gridlevel")
                 .attr("d", line);
-            
-            
+
+
             d3.transition(grid)
                 .attr('d', line );
-                
+
             grid.style("stroke", "#000")
                 .style("fill", "none")
                 .style("opacity", 0.3);
-            
+
             // Axes
             var ax = wrap.select("g.axes").selectAll("g.axis").data(legs);
             ax.exit().remove();
-            
+
 			var axEnter = ax.enter().append("g")
                 .attr("class", "axis");
-                
+
             var legText = axEnter.append("svg:text")
                 .style("text-anchor", function(d, i) {
 					var x = Math.sin(angle(i, size)) * scales(scales.domain()[1]);
@@ -591,11 +592,11 @@ nv.models.radarChart = function() {
 				})
 				.attr("dy", function(d, i) {
 					var y = Math.cos(angle(i, size)) * scales(scales.domain()[1]);
-                    
+
 					if (Math.abs(y) < 0.1) {
 						return ".72em"
 					}
-                    
+
 					if (y > 0) {
 						return "1em"
 					}
@@ -609,12 +610,12 @@ nv.models.radarChart = function() {
 				.attr("x", function(d, i) { return Math.sin(angle(i, size)) * scales(scales.domain()[1]);})
 				.attr("y", function(d, i) { return Math.cos(angle(i, size)) * scales(scales.domain()[1]);})
                 ;
-             
+
             legText.on('click', function(d,i) {
                     chart.cursor(legs.length - i);
                     selection.transition().call(chart);
                 });
-              
+
             d3.transition(ax)
                 .select("text")
                 .style("text-anchor", function(d, i) {
@@ -630,11 +631,11 @@ nv.models.radarChart = function() {
 				})
 				.attr("dy", function(d, i) {
 					var y = Math.cos(angle(i, size)) * scales(scales.domain()[1]);
-                    
+
 					if (Math.abs(y) < 0.1) {
 						return ".72em"
 					}
-                    
+
 					if (y > 0) {
 						return "1em"
 					}
@@ -644,7 +645,7 @@ nv.models.radarChart = function() {
     			.style("opacity", function(d,i){ return (i == current && edit) ? 1: 0.4; })
 				.attr("x", function(d, i) { return Math.sin(angle(i, size)) * scales(scales.domain()[1]);})
 				.attr("y", function(d, i) { return Math.cos(angle(i, size)) * scales(scales.domain()[1]);});
-            
+
             axEnter.append("svg:line")
                 .style("stroke", function(d){ return d.color; })
                 .style("fill", "none")
@@ -654,7 +655,7 @@ nv.models.radarChart = function() {
                 .attr("y1", function(d, i) { return Math.cos(angle(i, size)) * scales(scales.domain()[0]);})
                 .attr("x2", function(d, i) { return Math.sin(angle(i, size)) * scales(scales.domain()[1]);})
                 .attr("y2", function(d, i) { return Math.cos(angle(i, size)) * scales(scales.domain()[1]);});
-            
+
             d3.transition(ax)
                 .select("line")
                 .style("opacity", function(d,i){ return (i == current && edit) ? 1: 0.4; })
@@ -663,11 +664,11 @@ nv.models.radarChart = function() {
                 .attr("x2", function(d, i) { return Math.sin(angle(i, size)) * scales(scales.domain()[1]);})
                 .attr("y2", function(d, i) { return Math.cos(angle(i, size)) * scales(scales.domain()[1]);});
             //------------------------------------------------------------
-            
+
             //============================================================
             // Event Handling/Dispatching (in chart's scope)
             //------------------------------------------------------------
-            
+
             radars.dispatch.on('elementClick', function(d,i) {
                 chart.cursor(legs.length - d.pointIndex);
                 selection.transition().call(chart);
@@ -702,27 +703,27 @@ nv.models.radarChart = function() {
 
            /* legend.dispatch.on('legendClick', function(d,i) {
                 d.disabled = !d.disabled;
-                
+
                 if (!data.filter(function(d) { return !d.disabled }).length) {
                     data.map(function(d) {
                         d.disabled = false;
                         wrap.selectAll('.nv-series').classed('disabled', false);
-                        
+
                         return d;
                     });
                 }
                 chart.update();
             });*/
-              
+
             dispatch.on('tooltipShow', function(e) {
                 e.pos = [parseFloat(e.pos[0] + availableHeight/2 + margin.left), parseFloat(e.pos[1] + availableHeight/2 + margin.top)];
                 if (tooltips) showTooltip(e, that.parentNode);
             });
-            
+
             //============================================================
-        
+
         });
-        
+
         return chart;
     }
 
@@ -734,7 +735,7 @@ nv.models.radarChart = function() {
             b: parseInt(result[3], 16)
         } : null;
     }
-    
+
     function rgbToHex(r, g, b) {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
@@ -756,61 +757,61 @@ nv.models.radarChart = function() {
         var l = scales(d);
         return Math.cos(angle(i, length)) * l;
     }
- 
+
     // * build the spider axis * //
     // rewrite this to conform to d3 axis style? //
     function buildAxisGrid(length, ticks) {
         var min = scales.domain()[0];
         var max = scales.domain()[1] > 0 ? scales.domain()[1] : 1;
         var increase = max/ticks;
-        
+
         var gridData = []
         for (var i = 0; i <= ticks; i++ ) {
             var val = min + i*increase;
             var d = [val];
             var gridPoints = [];
-          
+
             for (var j = 0; j <= length; j++) {
                 gridPoints.push({
                     x: calculateX(d, j, length),
                     y: calculateY(d, j, length),
                 });
             }
-          
+
             gridData.push(gridPoints)
         }
 
         return gridData;
     }
-  
+
     //============================================================
     // Event Handling/Dispatching (out of chart's scope)
     //------------------------------------------------------------
-    
+
     radars.dispatch.on('elementMouseover.tooltip', function(e) {
         dispatch.tooltipShow(e);
     });
-    
+
     radars.dispatch.on('elementMouseout.tooltip', function(e) {
         dispatch.tooltipHide(e);
     });
-    
+
     dispatch.on('tooltipHide', function() {
         if (tooltips) nv.tooltip.cleanup();
     });
-    
+
     //============================================================
-    
-    
+
+
     //============================================================
     // Expose Public Variables
     //------------------------------------------------------------
-    
+
     // expose chart's sub-components
     chart.dispatch = dispatch;
     chart.radars = radars;
-    
-    
+
+
     chart.margin = function(_) {
         if (!arguments.length) return margin;
         margin.top    = typeof _.top    != 'undefined' ? _.top    : margin.top;
@@ -819,56 +820,56 @@ nv.models.radarChart = function() {
         margin.left   = typeof _.left   != 'undefined' ? _.left   : margin.left;
         return chart;
     };
-    
+
     chart.width = function(_) {
         if (!arguments.length) return width;
         width = _;
         return chart;
     };
-    
+
     chart.height = function(_) {
         if (!arguments.length) return height;
         height = _;
         return chart;
     };
-    
+
     chart.legs = function(_) {
         if (!arguments.length) return legs;
         legs = _;
         return chart;
     };
-    
+
     chart.showLegend = function(_) {
         if (!arguments.length) return showLegend;
         showLegend = _;
         return chart;
     };
-    
+
     chart.cursor = function(_) {
         if (!arguments.length) return cursor;
         cursor = _;
         return chart;
     };
-    
+
     chart.next = function(_) {
         cursor = cursor - 1;
         if (Math.abs(cursor) > legs.length-1) cursor = 0;
         return chart;
     };
-    
+
     chart.prev = function(_) {
         cursor = cursor + 1;
         if (cursor > legs.length-1) cursor = 0;
         return chart;
     };
-    
+
     chart.edit = function(_) {
         if (!arguments.length) return edit;
         edit = _;
         return chart;
     };
     //============================================================
-    
-    
+
+
     return chart;
 }
