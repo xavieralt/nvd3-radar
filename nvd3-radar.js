@@ -274,7 +274,7 @@ nv.models.radarChart = function() {
         , height = null
         , showLegend = true
         , legs = []
-        , ticks = 5
+        , ticks = 10 //Temp to test radar size issue
         , scales = d3.scale.linear()
         , edit = false
         , radius
