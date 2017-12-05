@@ -1,3 +1,4 @@
+
 nv.models.radar = function() {
 
     //============================================================
@@ -23,8 +24,8 @@ nv.models.radar = function() {
         .y(function(d) { return d.y});
 
     var  scatter = nv.models.scatter()
-            .size(16) // default size
-            .sizeDomain([16,256])
+            .pointSize(16) // default size
+            .pointDomain([16,256])
         ;
 
     //============================================================
@@ -98,7 +99,7 @@ nv.models.radar = function() {
             scatter
                 .xScale(scales)
                 .yScale(scales)
-                .zScale(scales)
+                .pointScale(scales)
                 .color(color)
                 .useVoronoi(false)
                 .width(availableWidth)
@@ -281,7 +282,7 @@ nv.models.radarChart = function() {
         , startAngle = 180
         , cursor = 0
         , tooltips = true
-        , transitionDuration = 250
+        , duration = 250
         , tooltip = function(key, leg, value, e, graph) {
             return '<h3>' + key + '</h3>' +
                    '<p>' + leg + ': ' +  value + '</p>'
@@ -334,7 +335,15 @@ nv.models.radarChart = function() {
                 availableWidth = (width  || parseInt(container.style('width')) || 500) - margin.left - margin.right,
                 availableHeight = (height || parseInt(container.style('height')) || 500) - margin.top - margin.bottom;
 
-            chart.update = function() { container.transition().duration(transitionDuration).call(chart) };
+            chart.update = function() {
+                if (duration === 0) {
+                    container.call(chart);
+                } else {
+                    container.transition()
+                        .duration(duration)
+                        .call(chart);
+                }
+            };
             chart.container = this;
 
             var current = 0;
@@ -868,6 +877,19 @@ nv.models.radarChart = function() {
         edit = _;
         return chart;
     };
+
+    chart.duration = function(_) {
+        if (!arguments.length) return duration;
+        duration = _;
+        radars.scatter.duration(_);
+        return chart;
+    };
+
+    chart.tooltips = function(_) {
+        if (!arguments.length) return tooltips;
+        tooltips = _;
+        return chart;
+    }
     //============================================================
 
 

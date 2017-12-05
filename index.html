@@ -1,54 +1,81 @@
 <!DOCTYPE html>
 <html lang="fr">
     <head>
-		<title>Graphique Radar</title>
-		<meta name="description" content="Graphique Radar d3.js & nvd3.js">
-		<meta name="author" content="Marc Dugas">
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Graphique Radar</title>
+        <meta name="description" content="Graphique Radar d3.js & nvd3.js">
+        <meta name="author" content="Marc Dugas">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="bower_components/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
+        <link href="bower_components/nvd3/build/nv.d3.css" rel="stylesheet" type="text/css">
         <style>
             html,body {margin:0;padding:0;width:100%;height:100%}
 
             text {
                 font: 12px sans-serif;
             }
-            
+
             svg {
                 display: block;
             }
-            
+
             #chart1, #chart1 svg {
                 width:100%;
                 height:100%;
                 min-width: 100px;
                 min-height: 100px;
             }
+            .nvd3 .axis line {
+                stroke: #000;
+                shape-rendering: crispEdges;
+            }
         </style>
-	</head>
-	<body>
+    </head>
+    <body>
           <div id="chart1">
             <svg></svg>
         </div>
 
          <script src="bower_components/d3/d3.js"></script>
-         <script src="bower_components/nvd3/nv.d3.js"></script>
+         <script src="bower_components/nvd3/build/nv.d3.js"></script>
          <script src="nvd3-radar.js"></script>
          <script>
 
              nv.addGraph(function() {
-                  var chart = nv.models.radarChart()
+                var chart = nv.models.radarChart()
                      .margin({top: 40, right: 130, bottom: 40, left: 40});
 
+                // Workaround bug in nvd3 scatter that wronly determine y-scale
+                // as being a lograrythm scale. We need to override the func.
+                // for that.
+                try {
+                    Object.defineProperty(chart.radars.scales(), 'name', {
+                      enumerable: false,
+                      configurable: false,
+                      writable: false,
+                      value: 'linear'
+                    });
+                }
+                catch (e) {
+                    // Hide all data point, better that showing them misplaced
+                    // - this is needed when printing under wkhtmltopdf ;-)
+                    chart.radars.dispatch.on('renderEnd', function() {
+                        console.log('unable to bypass bug from nvd3 scatter - ' +
+                                    'hiding data points (will be misplaced otherwise');
+                        d3.selectAll('.nv-point').each(function(point) {
+                            var g = d3.select(this);
+                            g.attr('class', g.attr('class') + ' nvtooltip-pending-removal');
+                        })
+                    });
+                }
 
-                 d3.select('#chart1 svg')
+                d3.select('#chart1 svg')
                      .datum(Radarvalues())
                      .call(chart);
 
-                 nv.utils.windowResize(chart.update);
+                nv.utils.windowResize(chart.update);
 
-                 return chart;
+                return chart;
              });
 
              function Radarvalues() {

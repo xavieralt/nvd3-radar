@@ -1,7 +1,7 @@
 {
   "name": "nvd3-radar",
   "version": "0.0.1",
-  "homepage": "https://github.com/analyticboard/nvd3-radar",
+  "homepage": "https://github.com/xavieralt/nvd3-radar",
   "authors": [
     "Marc Dugas",
     "Jaime Garcia"
@@ -23,7 +23,7 @@
     "tests"
   ],
   "dependencies": {
-    "d3": "~3.4.1",
-    "nvd3": "~v1.1.15-beta"
-   }
+    "d3": "3.5.6",
+    "nvd3": "v1.8.3"
+  }
 }
