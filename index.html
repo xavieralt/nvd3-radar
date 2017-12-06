@@ -43,7 +43,9 @@
 
              nv.addGraph(function() {
                 var chart = nv.models.radarChart()
-                     .margin({top: 40, right: 130, bottom: 40, left: 40});
+                     .duration(0)
+                     .margin({top: 40, right: 40, bottom: 40, left: 40})
+                     ;
 
                 // Workaround bug in nvd3 scatter that wronly determine y-scale
                 // as being a lograrythm scale. We need to override the func.
@@ -59,9 +61,9 @@
                 catch (e) {
                     // Hide all data point, better that showing them misplaced
                     // - this is needed when printing under wkhtmltopdf ;-)
-                    chart.radars.dispatch.on('renderEnd', function() {
-                        console.log('unable to bypass bug from nvd3 scatter - ' +
-                                    'hiding data points (will be misplaced otherwise');
+                    console.log('unable to bypass bug from nvd3 scatter - ' +
+                                'hiding data points (will be misplaced otherwise');
+                    chart.dispatch.on('renderEnd', function() {
                         d3.selectAll('.nv-point').each(function(point) {
                             var g = d3.select(this);
                             g.attr('class', g.attr('class') + ' nvtooltip-pending-removal');
